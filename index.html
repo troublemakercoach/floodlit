@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FLOODLIT — Live Workshop</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0a0a0a;
+    color: #ffffff;
+    width: 210mm;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    width: 210mm;
+    height: 72mm;
+    position: relative;
+    overflow: hidden;
+  }
+  .header-img {
+    position: absolute; inset: 0;
+    background-image: url('img/title.jpg');
+    background-size: cover;
+    background-position: center 35%;
+  }
+  .header-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom,
+      rgba(0,0,0,0.45) 0%,
+      rgba(0,0,0,0.72) 55%,
+      rgba(10,10,10,1) 100%);
+  }
+  .header-accent {
+    position: absolute; top:0; left:0; right:0;
+    height: 4px; background: #CC0000; z-index: 3;
+  }
+  .header-content {
+    position: relative; z-index: 2;
+    padding: 10mm 16mm 9mm;
+    height: 100%;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .live-label {
+    font-size: 7.5pt; font-weight: 700;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: #CC0000; margin-bottom: 3mm;
+  }
+  .headline {
+    font-size: 26pt; font-weight: 900; line-height: 1.08;
+    color: #ffffff; margin-bottom: 2mm;
+  }
+  .headline-sub {
+    font-size: 16pt; font-weight: 700; line-height: 1.1;
+    color: #CC0000; margin-bottom: 4mm;
+  }
+  .time-trade {
+    font-size: 11pt; font-weight: 500;
+    color: #cccccc; line-height: 1.5; max-width: 172mm;
+  }
+  .time-trade strong { color: #ffffff; font-weight: 700; }
+
+  /* ─── BODY ─── */
+  .body { padding: 7mm 16mm 4mm; }
+
+  .s-label {
+    font-size: 7pt; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: #CC0000; margin-bottom: 3mm;
+  }
+
+  /* ─── FOR WHO ─── */
+  .for-who {
+    background: rgba(204,0,0,0.06);
+    border-left: 3px solid #CC0000;
+    padding: 4mm 6mm; margin-bottom: 6mm;
+  }
+  .for-who p {
+    font-size: 10.5pt; font-weight: 600;
+    color: #dddddd; line-height: 1.55;
+  }
+  .for-who p strong { color: #ffffff; }
+
+  /* ─── PROOF ─── */
+  .proof {
+    border-left: 3px solid #222;
+    padding: 4mm 6mm; margin-bottom: 6mm;
+    background: rgba(255,255,255,0.02);
+  }
+  .proof-stats {
+    display: flex; gap: 7mm; margin-bottom: 3mm; align-items: flex-end;
+  }
+  .stat-num {
+    font-size: 20pt; font-weight: 900;
+    color: #CC0000; line-height: 1;
+  }
+  .stat-num.dim { color: #555; }
+  .stat-lbl {
+    font-size: 7.5pt; color: #666;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-top: 1mm; line-height: 1.3;
+  }
+  .proof-sep { width: 1px; background: #1e1e1e; align-self: stretch; margin: 0 1mm; }
+  .proof-copy {
+    font-size: 9.5pt; color: #999; line-height: 1.6;
+  }
+  .proof-copy strong { color: #dddddd; }
+
+  /* ─── SESSION FLOW ─── */
+  .session-flow {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 3mm; margin-bottom: 6mm;
+  }
+  .sf-box {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid #161616;
+    border-radius: 3px; padding: 4mm 5mm;
+  }
+  .sf-num {
+    font-size: 18pt; font-weight: 900;
+    color: #CC0000; line-height: 1; margin-bottom: 1mm;
+  }
+  .sf-time {
+    font-size: 6.5pt; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: #444; margin-bottom: 2mm;
+  }
+  .sf-title {
+    font-size: 10pt; font-weight: 800;
+    color: #ffffff; line-height: 1.2; margin-bottom: 2mm;
+  }
+  .sf-desc {
+    font-size: 8.5pt; color: #888; line-height: 1.5;
+  }
+  .sf-desc strong { color: #aaa; }
+
+  /* ─── TAKE-HOME ─── */
+  .take-home {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 5mm; margin-bottom: 6mm;
+  }
+  .th-box {
+    background: rgba(204,0,0,0.07);
+    border: 1px solid rgba(204,0,0,0.18);
+    border-radius: 3px; padding: 4.5mm 5.5mm;
+  }
+  .th-label {
+    font-size: 7pt; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: #CC0000; margin-bottom: 2mm;
+  }
+  .th-title {
+    font-size: 11pt; font-weight: 900;
+    color: #ffffff; margin-bottom: 2mm; line-height: 1.2;
+  }
+  .th-desc {
+    font-size: 9pt; color: #999; line-height: 1.5;
+  }
+  .th-desc strong { color: #cccccc; }
+
+  /* ─── NOT FOR ─── */
+  .not-for {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid #161616;
+    border-radius: 3px; padding: 4.5mm 6mm; margin-bottom: 4mm;
+  }
+  .not-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.5mm 7mm; margin-top: 2mm;
+  }
+  .not-item {
+    font-size: 9pt; color: #555; line-height: 1.5;
+    display: flex; gap: 2.5mm;
+  }
+  .not-item::before {
+    content: '✗'; color: #3a0000;
+    font-weight: 900; flex-shrink: 0;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider { height: 1px; background: #141414; margin-bottom: 4mm; }
+
+  /* ─── CTA ─── */
+  .cta-row {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 8mm;
+  }
+  .cta-price {
+    font-size: 20pt; font-weight: 900;
+    color: #ffffff; line-height: 1; margin-bottom: 1.5mm;
+  }
+  .cta-price span { font-size: 9.5pt; color: #444; font-weight: 400; }
+  .cta-gate {
+    font-size: 8.5pt; color: #CC0000;
+    font-weight: 600; margin-bottom: 2mm; line-height: 1.4;
+  }
+  .cta-guarantee {
+    font-size: 8pt; color: #555;
+    font-style: italic; margin-bottom: 2mm; line-height: 1.5;
+  }
+  .cta-meta {
+    font-size: 8pt; color: #444; line-height: 1.7;
+  }
+  .cta-meta strong { color: #666; }
+  .cta-btn {
+    display: block;
+    background: #CC0000; color: #ffffff;
+    font-size: 10pt; font-weight: 900;
+    letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 5mm 10mm; border-radius: 3px;
+    text-align: center; white-space: nowrap; flex-shrink: 0;
+    line-height: 1.35; text-decoration: none;
+  }
+  .cta-link { font-size: 7.5pt; color: #333; text-align: center; margin-top: 2mm; }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    padding: 4.5mm 16mm;
+    border-top: 1px solid #111;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer span { font-size: 7pt; color: #252525; letter-spacing: 0.1em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-img"></div>
+  <div class="header-overlay"></div>
+  <div class="header-accent"></div>
+  <div class="header-content">
+    <div class="live-label">FLOODLIT — Live Workshop · Exec Series · Catalyst Academy</div>
+    <div class="headline">Your P6 knows things<br>your site meeting doesn't.</div>
+    <div class="headline-sub">This exposes them.</div>
+    <div class="time-trade">
+      In <strong>60 minutes</strong>, you'll see exactly where your project is drifting —
+      and walk out with a system that shows you <strong>every week.</strong>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- WHO THIS IS FOR -->
+  <div class="s-label">Who This Is For</div>
+  <div class="for-who">
+    <p>The Project Director who knows his team is working hard but <strong>can't put his finger on why the project is drifting.</strong> The report says on track. The feeling says otherwise. The constraint is there — visible to everyone on the ground — but nobody's named it, nobody's acting on it, and the gap between what the schedule says and what's actually happening keeps widening. <strong>This session shows you exactly where it is.</strong></p>
+  </div>
+
+  <!-- PROOF -->
+  <div class="s-label">Where This Started</div>
+  <div class="proof">
+    <div class="proof-stats">
+      <div>
+        <div class="stat-num">2,500h</div>
+        <div class="stat-lbl">Forecast<br>this month</div>
+      </div>
+      <div class="proof-sep"></div>
+      <div>
+        <div class="stat-num dim">1,187h</div>
+        <div class="stat-lbl">Actually<br>earning</div>
+      </div>
+      <div class="proof-sep"></div>
+      <div style="padding-bottom:2mm;">
+        <div style="font-size:10pt; font-weight:700; color:#555; line-height:1.4;">Everyone knew.<br>Nobody was acting.</div>
+      </div>
+    </div>
+    <div class="proof-copy">
+      Cooling tower project. The gap between forecast and actual was there from week one. <strong>Everyone could feel the drift. No one was focused on the number.</strong> So I wrote the EV on the whiteboard every morning. Just the number. Visible. Daily. That single act changed the site.<br>
+      This workshop is what that whiteboard became when Claude learned to read the schedule.
+    </div>
+  </div>
+
+  <!-- SESSION FLOW -->
+  <div class="s-label">What Happens Inside 60 Minutes</div>
+  <div class="session-flow">
+    <div class="sf-box">
+      <div class="sf-num">1</div>
+      <div class="sf-time">0 – 10 min</div>
+      <div class="sf-title">The Problem</div>
+      <div class="sf-desc">The Cooling Tower story. <strong>The drift that everyone felt and nobody named.</strong> The gap that was there from week one. Why writing the number on the whiteboard changed everything — and why most projects never do it.</div>
+    </div>
+    <div class="sf-box">
+      <div class="sf-num">2</div>
+      <div class="sf-time">10 – 20 min</div>
+      <div class="sf-title">The Discovery</div>
+      <div class="sf-desc">How the whiteboard became a process. How the process became a system. <strong>And how AI now does in three minutes what used to take a full day.</strong> The evolution — lived, not theorised.</div>
+    </div>
+    <div class="sf-box">
+      <div class="sf-num">3</div>
+      <div class="sf-time">20 – 40 min</div>
+      <div class="sf-title">The System — Live</div>
+      <div class="sf-desc">A real P6 schedule. Uploaded live. Claude reads it, <strong>finds the constraint, maps the cascade, and builds the dashboard in front of you.</strong> Chaos Index, resource bottlenecks, overrun risk, recovery brief — all of it. In minutes.</div>
+    </div>
+    <div class="sf-box">
+      <div class="sf-num">4</div>
+      <div class="sf-time">40 – 60 min</div>
+      <div class="sf-title">Your Project</div>
+      <div class="sf-desc">Walk through the take-home prompt. <strong>Everything you just watched — you can run on your own schedule Monday morning.</strong> If you want to go further, you'll hear what that looks like.</div>
+    </div>
+  </div>
+
+  <!-- TAKE-HOME -->
+  <div class="s-label">What You Walk Away With</div>
+  <div class="take-home">
+    <div class="th-box">
+      <div class="th-label">The Master Prompt</div>
+      <div class="th-title">One prompt.<br>Your whole project.</div>
+      <div class="th-desc">Nine outputs. Three dashboards. <strong>Upload your P6 and run the full system on your own project</strong> — Chaos Index, constraint map, resource collisions, overrun cascade, recovery brief. No guesswork. No planner required.</div>
+    </div>
+    <div class="th-box">
+      <div class="th-label">What Comes Next — If You Want It</div>
+      <div class="th-title">Stealth Team Lab.<br>By application.</div>
+      <div class="th-desc">Beanie works directly inside your team to <strong>build and run this system on your live project.</strong> No pitch on the call. No pressure. If it feels right, you put an application in.</div>
+    </div>
+  </div>
+
+  <!-- NOT FOR -->
+  <div class="not-for">
+    <div class="s-label">This Is Not For You If</div>
+    <div class="not-grid">
+      <div class="not-item">You want a reporting template, not a signal system</div>
+      <div class="not-item">You think the schedule belongs to the planners</div>
+      <div class="not-item">You're looking for more meetings, not fewer</div>
+      <div class="not-item">Your project is under $100M — this is built for megaprojects</div>
+      <div class="not-item">You want a consultant to fix it without your team</div>
+      <div class="not-item">You won't invest in Claude Max Plan to run it after</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CTA -->
+  <div class="cta-row">
+    <div>
+      <div class="cta-price">$190 USD <span>/ seat</span></div>
+      <div class="cta-gate">Requires active Catalyst Academy membership — $197 USD/month</div>
+      <div class="cta-guarantee">You'll know in the first 5 minutes whether this is for you. Walk if it's not.</div>
+      <div class="cta-meta">
+        <strong>Format:</strong> 60 min live — Zoom or Teams<br>
+        <strong>Size:</strong> Maximum 10 participants<br>
+        <strong>After the session:</strong> Claude Max Plan required to run the system
+      </div>
+    </div>
+    <div>
+      <a class="cta-btn" href="https://wa.me/+61400179819">Message Me on WhatsApp<br>to Secure Your Seat →</a>
+      <div class="cta-link">wa.me/+61400179819</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>UNBOXED Workshops · Construction Skool</span>
+  <span>Catalyst Academy — skool.com/scrum</span>
+</div>
+
+</body>
+</html>
