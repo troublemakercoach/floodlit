@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Floodlit WAR Room</title>
+<meta name="description" content="A functioning WAR Room before Christmas. Whiteboard to Dashboard with the Floodlit Process.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #121212;
+    --panel-2: #181818;
+    --line: #242424;
+    --text: #ffffff;
+    --muted: #b5b5b5;
+    --dim: #7a7a7a;
+    --red: #CC0000;
+    --red-soft: #ff3b3b;
+    --green: #00B050;
+    --amber: #FFB000;
+    --grey-cell: #3a3a3a;
+    --marker: 'Permanent Marker', cursive;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: var(--bg); scroll-behavior: smooth; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  .narrow { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .kicker {
+    font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--red-soft); margin-bottom: 14px;
+  }
+  h2 { font-size: clamp(28px, 4.6vw, 44px); font-weight: 900; line-height: 1.08; letter-spacing: -0.5px; margin-bottom: 18px; }
+  h3 { font-size: 20px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+  p { color: var(--muted); font-size: 17px; margin-bottom: 14px; }
+  p strong { color: var(--text); }
+  .marker { font-family: var(--marker); font-weight: 400; letter-spacing: 0.5px; }
+
+  /* Countdown bar */
+  .countdown {
+    position: sticky; top: 0; z-index: 20; background: var(--red); color: #fff;
+    font-size: 14px; font-weight: 700; text-align: center; padding: 10px 16px;
+  }
+  .countdown .t { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .countdown a { margin-left: 12px; white-space: nowrap; text-decoration: underline; }
+
+  /* Hero */
+  .hero { padding: 64px 0 72px; border-top: none; text-align: center; }
+  .hero h1 {
+    font-size: clamp(40px, 8vw, 82px); font-weight: 900; line-height: 1.0; letter-spacing: -1.5px; margin: 6px 0 20px;
+  }
+  .hero h1 .red { color: var(--red-soft); }
+  .hero .sub { font-size: clamp(18px, 2.6vw, 23px); color: #e6e6e6; max-width: 720px; margin: 0 auto 14px; }
+  .hero .support { font-size: 16px; color: var(--dim); max-width: 620px; margin: 0 auto 30px; }
+  .w2d { display: inline-flex; align-items: center; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; justify-content: center; }
+  .w2d span.chip { font-family: var(--marker); font-size: 22px; padding: 6px 16px; border: 2px solid #fff; border-radius: 6px; transform: rotate(-1.5deg); }
+  .w2d span.chip.dash { border-color: var(--green); color: var(--green); transform: rotate(1deg); }
+  .w2d .arrow { font-size: 26px; color: var(--red-soft); }
+
+  .btn {
+    display: inline-block; background: var(--red); color: #fff; text-decoration: none;
+    font-weight: 800; font-size: 18px; padding: 18px 30px; border-radius: 8px;
+    transition: transform .15s ease, background .15s ease; text-align: center;
+  }
+  .btn:hover { background: #e00000; transform: translateY(-2px); }
+  .btn small { display: block; font-size: 12px; font-weight: 600; opacity: .85; margin-top: 3px; }
+  .cta-row { text-align: center; margin-top: 36px; }
+
+  /* Story */
+  .story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; }
+  .story-photo { position: relative; }
+  .story-photo img { width: 100%; border-radius: 10px; display: block; transform: rotate(-1.2deg); box-shadow: 0 20px 50px rgba(0,0,0,.6); }
+  .story-photo .cap { font-size: 13px; color: var(--dim); margin-top: 14px; text-align: center; }
+  .gap { display: flex; gap: 14px; margin: 22px 0 22px; }
+  .gap > div { flex: 1; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .gap .num { font-size: 38px; font-weight: 900; line-height: 1; }
+  .gap .lbl { font-size: 13px; color: var(--dim); margin-top: 6px; }
+  .gap .need .num { color: #fff; }
+  .gap .got .num { color: var(--red-soft); }
+  .gap .after .num { color: var(--green); }
+  .pull { font-family: var(--marker); font-size: 26px; color: #fff; line-height: 1.25; margin: 20px 0 6px; }
+
+  /* Flow */
+  .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin-top: 34px; position: relative; }
+  .stage { position: relative; padding: 0 10px; }
+  .stage .box {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 16px; height: 100%;
+  }
+  .stage .num { font-size: 12px; font-weight: 800; color: var(--red-soft); letter-spacing: 2px; }
+  .stage h3 { font-size: 17px; margin: 6px 0 8px; }
+  .stage p { font-size: 14px; margin-bottom: 8px; }
+  .stage ul { list-style: none; }
+  .stage li { font-size: 13px; color: var(--muted); padding: 4px 0; border-top: 1px solid var(--line); }
+  .stage li:first-child { border-top: none; }
+  .stage .box.wb { background: #f4f4f1; color: #111; border-color: #ddd; }
+  .stage .box.wb h3 { font-family: var(--marker); font-weight: 400; font-size: 22px; color: #0a6; }
+  .stage .box.wb p, .stage .box.wb li { color: #333; border-color: #ddd; }
+  .stage .box.wb .num { color: #c00; }
+  .stage .box.dash { border-color: var(--green); }
+  .stage .box.engine { border-color: var(--red); }
+  .stage:not(:last-child)::after {
+    content: '→'; position: absolute; right: -9px; top: 50%; transform: translateY(-50%);
+    color: var(--red-soft); font-size: 22px; font-weight: 900; z-index: 2;
+  }
+  .loop {
+    margin: 22px 10px 0; border: 2px dashed #3a3a3a; border-top: none; border-radius: 0 0 16px 16px;
+    padding: 14px 18px 12px; text-align: center; position: relative;
+  }
+  .loop::before { content: '↑'; position: absolute; left: 34px; top: -14px; color: var(--red-soft); font-weight: 900; font-size: 22px; }
+  .loop p { margin: 0; font-size: 15px; }
+  .loop .marker { color: #fff; font-size: 20px; }
+
+  /* Tools */
+  .tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 30px; }
+  .tool { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  .tool .tag { font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+  .tool h3 { margin-top: 6px; }
+  .tool p { font-size: 15px; margin-bottom: 8px; }
+  .tool .so { color: #fff; font-weight: 600; font-size: 15px; border-left: 3px solid var(--red); padding-left: 12px; margin-top: 12px; }
+  .tool.feature { grid-column: 1 / -1; border-color: #333; }
+  .advisors { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+  .advisors span { font-size: 12px; font-weight: 600; background: var(--panel-2); border: 1px solid var(--line); border-radius: 20px; padding: 5px 12px; color: #ddd; }
+  .bar { height: 10px; border-radius: 6px; background: #222; overflow: hidden; display: flex; margin: 10px 0 4px; }
+  .bar i { display: block; height: 100%; }
+
+  /* 5D Mock-up */
+  .mock { background: #0f1115; border: 1px solid #2a2d33; border-radius: 14px; overflow: hidden; margin-top: 30px; }
+  .mock-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #161a20; border-bottom: 1px solid #2a2d33; flex-wrap: wrap; }
+  .mock-top .title { font-weight: 800; font-size: 14px; }
+  .mock-top .pill { font-size: 10px; font-weight: 800; letter-spacing: 1px; background: var(--amber); color: #111; border-radius: 4px; padding: 2px 6px; }
+  .mock-top .meta { font-size: 12px; color: #8a919c; }
+  .tabs { display: flex; gap: 4px; padding: 8px 14px 0; background: #161a20; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button {
+    background: transparent; color: #8a919c; border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
+    font: 600 12px 'Inter', sans-serif; padding: 7px 11px; white-space: nowrap; cursor: pointer;
+  }
+  .tabs button.on { background: #0f1115; color: #fff; border-color: #2a2d33; }
+  .mock-body { display: grid; grid-template-columns: 1fr 280px; }
+  .scene { position: relative; min-height: 340px; }
+  .scene svg { width: 100%; height: 100%; display: block; }
+  .legend { position: absolute; top: 12px; left: 14px; font-size: 11px; color: #aab; display: grid; gap: 4px; background: rgba(15,17,21,.8); padding: 8px 10px; border-radius: 6px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .scene { height: 420px; min-height: 0; background: #c4ccd2; overflow: hidden; }
+  #plant { position: absolute; inset: 0; }
+  #plant canvas { display: block; }
+  .legend { color: #2b3036 !important; background: rgba(255,255,255,.82) !important; transition: opacity .2s; z-index: 2; }
+  .viewbtn { position: absolute; top: 12px; right: 12px; z-index: 3; background: rgba(15,17,21,.85); color: #fff; border: 1px solid #3a3f46; border-radius: 6px; font: 700 12px 'Inter', sans-serif; padding: 7px 12px; cursor: pointer; }
+  .hint { position: absolute; bottom: 10px; left: 14px; z-index: 2; font-size: 11px; color: #3b4148; background: rgba(255,255,255,.7); padding: 3px 8px; border-radius: 4px; pointer-events: none; }
+  .lbl3d { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; font: 800 11px 'Inter', sans-serif; letter-spacing: .5px; color: #fff; background: rgba(15,17,21,.78); padding: 3px 7px; border-radius: 4px; white-space: nowrap; }
+  .tip3d { display: none; position: absolute; z-index: 4; pointer-events: none; background: #0f1115; color: #fff; border: 1px solid #3a3f46; border-radius: 6px; padding: 7px 10px; font-size: 12px; line-height: 1.4; white-space: nowrap; }
+  .tip3d .done { color: #00B050; } .tip3d .prog { color: #FFB000; } .tip3d .red { color: #ff3b3b; } .tip3d .none { color: #8a919c; }
+  .side { border-left: 1px solid #2a2d33; padding: 14px; font-size: 12px; color: #aab; }
+  .side h4 { font-size: 12px; color: #fff; margin-bottom: 8px; }
+  .side table { width: 100%; border-collapse: collapse; }
+  .side td { padding: 5px 4px; border-top: 1px solid #22262c; vertical-align: top; }
+  .side td:first-child { color: #fff; white-space: nowrap; font-weight: 600; }
+  .side .flag { color: var(--red-soft); font-weight: 700; }
+  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid #2a2d33; }
+  .kpi { padding: 12px 14px; border-right: 1px solid #2a2d33; }
+  .kpi:last-child { border-right: none; }
+  .kpi .k { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #8a919c; font-weight: 700; }
+  .kpi .v { font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .kpi .s { font-size: 11px; color: #8a919c; }
+  .scrub { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid #2a2d33; background: #161a20; }
+  .scrub button { background: var(--red); color: #fff; border: none; border-radius: 6px; font: 800 13px 'Inter'; padding: 8px 14px; cursor: pointer; min-width: 70px; }
+  .scrub input { flex: 1; accent-color: var(--red); }
+  .scrub .wk { font-size: 13px; font-weight: 700; min-width: 74px; text-align: right; font-variant-numeric: tabular-nums; }
+  .when { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 20px; padding: 14px; border-top: 1px solid #2a2d33; }
+  .when div { font-size: 12px; color: #6d7480; padding: 6px 8px; border-radius: 6px; border: 1px solid transparent; }
+  .when div b { color: inherit; }
+  .when div.done { color: #cfd3da; }
+  .when div.done::before { content: '✓ '; color: var(--green); font-weight: 900; }
+  .when div.now { color: #fff; border-color: var(--amber); background: rgba(255,176,0,.08); }
+  .when div.now::before { content: '▶ '; color: var(--amber); }
+  .mock-note { font-size: 12px; color: var(--dim); text-align: center; margin-top: 12px; }
+
+  /* Get */
+  .get { counter-reset: g; display: grid; gap: 12px; margin-top: 26px; }
+  .get div { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px 18px 70px; position: relative; }
+  .get div::before { counter-increment: g; content: '0' counter(g); position: absolute; left: 20px; top: 16px; font-weight: 900; font-size: 24px; color: var(--red-soft); }
+  .get h3 { font-size: 18px; margin-bottom: 4px; }
+  .get p { font-size: 15px; margin: 0; }
+
+  /* Pricing */
+  .prices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 30px; }
+  .price { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 26px; display: flex; flex-direction: column; }
+  .price.hl { border-color: var(--red); }
+  .price .amt { font-size: 46px; font-weight: 900; line-height: 1; }
+  .price .amt span { font-size: 16px; color: var(--dim); font-weight: 600; }
+  .price h3 { margin: 14px 0 6px; }
+  .price p { font-size: 15px; }
+  .price dl { font-size: 14px; color: var(--muted); margin: 6px 0 20px; }
+  .price dt { color: #fff; font-weight: 700; display: inline; }
+  .price dd { display: inline; margin: 0; }
+  .price dd::after { content: ''; display: block; margin-bottom: 4px; }
+  .price .btn { margin-top: auto; font-size: 16px; padding: 15px 18px; }
+
+  /* Not for */
+  .notfor { list-style: none; margin-top: 18px; }
+  .notfor li { font-size: 17px; color: var(--muted); padding: 12px 0 12px 34px; border-top: 1px solid var(--line); position: relative; }
+  .notfor li::before { content: '✗'; position: absolute; left: 4px; color: var(--red-soft); font-weight: 900; }
+
+  /* Two options */
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 26px 0 0; }
+  .opt { border-radius: 12px; padding: 22px; border: 1px solid var(--line); }
+  .opt.a { background: #140b0b; border-color: #3a1414; }
+  .opt.b { background: #0b140e; border-color: #144a26; }
+  .opt .marker { font-size: 22px; display: block; margin-bottom: 8px; }
+  .opt.a .marker { color: var(--red-soft); }
+  .opt.b .marker { color: var(--green); }
+  .opt p { font-size: 15px; margin-bottom: 0; }
+
+  footer { border-top: 1px solid var(--line); padding: 48px 0 64px; text-align: center; }
+  footer .legal { font-size: 12px; color: var(--dim); max-width: 560px; margin: 10px auto 0; }
+  footer .legal a { color: var(--muted); }
+  footer p { font-size: 14px; color: var(--dim); margin-bottom: 6px; }
+  footer .q { font-style: italic; color: var(--muted); margin-top: 16px; }
+
+  @media (max-width: 900px) {
+    .flow { grid-template-columns: 1fr; gap: 26px; }
+    .stage { padding: 0; }
+    .stage:not(:last-child)::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -26px; transform: translateX(-50%); }
+    .loop { margin: 26px 0 0; }
+    .mock-body { grid-template-columns: 1fr; }
+    .side { border-left: none; border-top: 1px solid #2a2d33; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .kpi { border-bottom: 1px solid #2a2d33; }
+    .when { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    section { padding: 56px 0; }
+    .story-grid, .tools, .prices, .options { grid-template-columns: 1fr; }
+    .story-photo { max-width: 420px; margin: 0 auto; }
+    .scene { height: 320px; }
+    .hint { display: none; }
+    .countdown { font-size: 13px; }
+    .countdown a { display: none; }
+    .when { grid-template-columns: 1fr; }
+    .btn { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<div class="countdown" role="status">
+  WAR Room before Christmas: <span class="t" id="cd">-- days --h --m --s</span> left
+  <a href="#book">Book in</a>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="narrow">
+    <div class="kicker">Floodlit · The WAR Room Process</div>
+    <h1>A functioning<br>WAR Room.<br><span class="red">Before Christmas.</span></h1>
+    <div class="w2d" aria-label="Whiteboard to Dashboard">
+      <span class="chip">Whiteboard</span><span class="arrow">→</span><span class="chip dash">Dashboard</span>
+    </div>
+    <p class="sub">One daily prompt. My Floodlit Process, run on your project.</p>
+    <p class="support">Your schedule. Your field data. Your whiteboard. Read every day, mapped to one dashboard, and back on the wall by the next morning's meeting.</p>
+    <a class="btn" href="#book">Book in for a Floodlit session →</a>
+  </div>
+</header>
+
+<!-- STORY -->
+<section id="story">
+  <div class="wrap story-grid">
+    <div>
+      <div class="kicker">Where this started</div>
+      <h2>The report said it. Nobody was looking.</h2>
+      <p>Cooling tower project. The reports said we needed to earn <strong>2,200 hours a day.</strong></p>
+      <p>We were earning <strong>1,187.</strong></p>
+      <div class="gap">
+        <div class="need"><div class="num">2,200</div><div class="lbl">hours a day needed</div></div>
+        <div class="got"><div class="num">1,187</div><div class="lbl">hours a day earned</div></div>
+      </div>
+      <p>Nobody was hiding it. It was right there in the report. Everybody just ignored it. Heads in the sand. "Oh well, this is what it is."</p>
+      <p>So I wrote the earned number on the whiteboard. Every morning. Just the number. Visible. Daily.</p>
+      <div class="gap">
+        <div class="after"><div class="num">2,000+</div><div class="lbl">hours a day average, after the whiteboard</div></div>
+      </div>
+      <p class="pull">The whiteboard was the first WAR Room.</p>
+      <p>Floodlit is what it became when Claude learned to read the schedule.</p>
+    </div>
+    <div class="story-photo">
+      <img src="img/whiteboard-ev.jpg" alt="Whiteboard showing Daily E.V. numbers for each day of the week, written in marker" loading="lazy">
+      <div class="cap">The real board. Daily EV, one number a day.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section id="flow">
+  <div class="wrap">
+    <div class="kicker">Whiteboard to Dashboard</div>
+    <h2>How the data flows through the WAR Room.</h2>
+    <p style="max-width:700px">The whiteboard doesn't get replaced. It gets fed. What the crews write up in the morning and what the schedule says on Friday end up on the same screen.</p>
+
+    <div class="flow">
+      <div class="stage">
+        <div class="box wb">
+          <div class="num">01</div>
+          <h3>The Whiteboard</h3>
+          <p>The WAR Room wall. Written by the people doing the work.</p>
+          <ul>
+            <li>Today's earned number</li>
+            <li>The constraint, named</li>
+            <li>Down and Dirty TAKT: top 10 tasks, crews on name tags</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="box">
+          <div class="num">02</div>
+          <h3>Capture</h3>
+          <p>Three inputs. Nothing typed twice.</p>
+          <ul>
+            <li>Photo of the board</li>
+            <li>Field data: weld register, hours</li>
+            <li>Friday's P6 .xer</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="box engine">
+          <div class="num">03</div>
+          <h3>Claude reads it</h3>
+          <p>The prompts. Reads, maps, surfaces. Never edits your schedule.</p>
+          <ul>
+            <li>Chaos Index</li>
+            <li>Monte Carlo</li>
+            <li>The Board Assessment</li>
+            <li>Weighted Weld DI</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="box dash">
+          <div class="num">04</div>
+          <h3>The Dashboard</h3>
+          <p>Two places the truth lands.</p>
+          <ul>
+            <li>The 5D Model</li>
+            <li>The Weekly Report</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="box wb">
+          <div class="num">05</div>
+          <h3>Back on the wall</h3>
+          <p>One question for tomorrow's meeting.</p>
+          <ul>
+            <li>What all five advisors agree on</li>
+            <li>Who owns it</li>
+            <li>By when</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="loop">
+      <p><span class="marker">Every day. Same loop.</span><br>Learn to See → Stop &amp; Fix → Share the Learning → Spread the Change</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools">
+  <div class="wrap">
+    <div class="kicker">Inside the WAR Room</div>
+    <h2>The tools. Built on real jobs.</h2>
+    <p style="max-width:700px">Each one answers a question your monthly report doesn't. This is the WAR Room I run. The daily prompt is where yours starts.</p>
+
+    <div class="tools">
+      <div class="tool feature">
+        <div class="tag">On the wall</div>
+        <h3>Down and Dirty TAKT</h3>
+        <p>Stand up. Don't sit down. The top 10 tasks on the board, boxes marked, name tags on the crews. The whole scope planned in 15 minutes a day.</p>
+        <p class="so">Planning doesn't have to take hours. It has to happen every day, in front of the people doing the work.</p>
+      </div>
+
+      <div class="tool">
+        <div class="tag">One number</div>
+        <h3>The Chaos Index</h3>
+        <p>0 to 100, read straight off the schedule. Three parts: pace, overrun and late starts.</p>
+        <div class="bar" aria-label="Chaos Index weighting: pace 20, overrun 65, late starts 15">
+          <i style="width:20%;background:#555"></i><i style="width:65%;background:var(--red)"></i><i style="width:15%;background:#888"></i>
+        </div>
+        <p style="font-size:12px;color:var(--dim)">Pace 20 · Overrun 65 · Late starts 15</p>
+        <p class="so">Pace can read fine the whole way through a late job. Overrun is the part that moves your finish date.</p>
+      </div>
+
+      <div class="tool">
+        <div class="tag">Finish date</div>
+        <h3>The Monte Carlo</h3>
+        <p>Thousands of runs through your schedule logic. Realistic productivity, not the planner's best day. A disruption ladder from 0 to 60%.</p>
+        <p class="so">You get a P50 and a P90 finish. Not one hopeful date.</p>
+      </div>
+
+      <div class="tool">
+        <div class="tag">Devil's Advocate</div>
+        <h3>The Board Assessment</h3>
+        <p>Five advisors read the same schedule. Independently. Then the read is synthesised into what all five agree on.</p>
+        <div class="advisors">
+          <span>Keith Cunningham · Thinking Time</span>
+          <span>Eli Goldratt · Constraints</span>
+          <span>Jason Schroeder · Lean</span>
+          <span>Christian Boucousis · Afterburner</span>
+          <span>Alan Bernard · Critical Chain</span>
+        </div>
+        <p class="so">One question: what don't I see? Not one opinion dressed up as five.</p>
+      </div>
+
+      <div class="tool">
+        <div class="tag">Piping progress</div>
+        <h3>Weighted Welding Dia Inches</h3>
+        <p>Not every weld is equal. A 24 inch butt weld is not a 2 inch one. Count welds and the job looks further along than it is.</p>
+        <p>Butts and diameter inches, compared between two register dates.</p>
+        <p class="so">Weld count tells you activity. Diameter inches tell you progress.</p>
+      </div>
+
+      <div class="tool">
+        <div class="tag">Flow</div>
+        <h3>PVR: Project Velocity Ratio</h3>
+        <p>Completed, divided by in progress plus stuck. Above 1.0, work is finishing faster than it piles up. Below 0.65, it's piling up.</p>
+        <p class="so">Starting work feels like progress. Finishing it is progress.</p>
+      </div>
+
+      <div class="tool">
+        <div class="tag">The real risk</div>
+        <h3>The Earned Value Gap</h3>
+        <p>Planned to date, minus earned. Plotted every day next to the Chaos Index, so the gap between "P6 says fine" and the real position is on one chart.</p>
+        <p class="so">This is the whiteboard number, grown up.</p>
+      </div>
+
+      <div class="tool feature">
+        <div class="tag">Dashboard</div>
+        <h3>The 5D Model</h3>
+        <p>Your project in 3D, played week by week. Time and cost on top of the geometry. Every tab built for your job, not a template.</p>
+        <div class="advisors">
+          <span>3D build</span><span>Materials</span><span>Supply chain map</span><span>Throughput</span><span>TAKT board</span><span>Zone map</span><span>Unassigned and checks</span>
+        </div>
+        <p class="so">The site team and the PD look at the same picture. Same day.</p>
+      </div>
+
+      <div class="tool feature">
+        <div class="tag">Every Friday</div>
+        <h3>The Weekly Report</h3>
+        <p>Built from Friday's .xer. The chart leads, then 3 to 5 bullets. Every figure traced to a source and a date. A 7-day look ahead. Nothing repeated from last week without a reason.</p>
+        <p class="so">Exec level. No waffle. The report that says what the whiteboard says.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5D MOCK-UP -->
+<section id="model">
+  <div class="wrap">
+    <div class="kicker">Custom built for your project</div>
+    <h2>Here's one built for a gold mine wet area.</h2>
+    <p style="max-width:720px">Flotation cells, thickener, slurry lines. Press play and watch it build. Yours gets built around your scope, your crews and your schedule.</p>
+
+    <div class="mock" aria-label="Mock-up of a 5D model dashboard for a gold mine flotation area">
+      <div class="mock-top">
+        <span class="title">5D Model: Wet Area, Flotation</span>
+        <span class="pill">EXAMPLE DATA</span>
+        <span class="meta">Mock-up project · Data date from Friday's .xer</span>
+      </div>
+      <div class="tabs" role="tablist">
+        <button class="on">3D build</button><button>Materials</button><button>Supply chain map</button><button>Throughput</button><button>TAKT board</button><button>Zone map</button><button>Unassigned and checks</button>
+      </div>
+      <div class="mock-body">
+        <div class="scene">
+          <div id="plant" aria-label="3D view of flotation cells, thickener and slurry lines changing colour as they are built"></div>
+          <button class="viewbtn" id="viewMode">Realistic view</button>
+          <div class="hint">Drag to orbit · hover for status</div>
+          <div class="legend" id="legend">
+            <div><i style="background:var(--green)"></i>Complete</div>
+            <div><i style="background:var(--amber)"></i>In progress</div>
+            <div><i style="background:var(--red)"></i>Constraint</div>
+            <div><i style="background:var(--grey-cell)"></i>Not started</div>
+          </div>
+        </div>
+        <div class="side">
+          <h4 id="sideTitle">Next 7 days</h4>
+          <table id="sideTable"></table>
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="k">Cells complete</div><div class="v" id="kCells">0 of 10</div><div class="s">rougher + cleaner</div></div>
+        <div class="kpi"><div class="k">Earned hours</div><div class="v" id="kHrs">0</div><div class="s">of 48,000</div></div>
+        <div class="kpi"><div class="k">Weld DI</div><div class="v" id="kDI">0</div><div class="s">of 9,600 dia inches</div></div>
+        <div class="kpi"><div class="k">Chaos Index</div><div class="v" id="kChaos">-</div><div class="s" id="kChaosBand">&nbsp;</div></div>
+        <div class="kpi"><div class="k">P90 finish</div><div class="v" id="kP90">-</div><div class="s">Monte Carlo</div></div>
+      </div>
+      <div class="scrub">
+        <button id="play" aria-label="Play build">▶ Play</button>
+        <input type="range" id="week" min="0" max="24" step="0.1" value="0" aria-label="Week">
+        <span class="wk" id="wkLbl">Week 0</span>
+      </div>
+      <div class="when" id="when"></div>
+    </div>
+    <p class="mock-note">Mock-up. Example project and example numbers. Not a real site.</p>
+  </div>
+</section>
+
+<!-- WHAT YOU GET -->
+<section id="get">
+  <div class="narrow">
+    <div class="kicker">What you get</div>
+    <h2>One daily prompt. The whole process.</h2>
+    <p>Not a training. Not a template. The prompt that runs you through my Floodlit Process, every day, on your own project.</p>
+    <div class="get">
+      <div><h3>The daily prompt</h3><p>Run it every morning. It walks you through the Floodlit Process, Whiteboard to Dashboard. Reads, maps, surfaces. Never edits your schedule.</p></div>
+      <div><h3>Your schedule, live</h3><p>In the session we run it on your actual file. Not a demo. You see it work on your project before you leave.</p></div>
+      <div><h3>The data flow</h3><p>Whiteboard, field data and Friday's .xer, mapped to one dashboard. Nothing typed twice.</p></div>
+      <div><h3>The reps stay yours</h3><p>The prompt is the head start. Your team builds the skill by running it every day.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="book">
+  <div class="wrap">
+    <div class="kicker">Book in</div>
+    <h2>Two ways in.</h2>
+    <div class="prices">
+      <div class="price">
+        <div class="amt">$191 USD <span>/ month</span></div>
+        <h3>Catalyst Academy</h3>
+        <p>Includes access to all FLOODLIT workshops, run inside Construction Skool. Cancel anytime.</p>
+        <dl>
+          <dt>Format: </dt><dd>60 min live, Zoom or Teams</dd>
+          <dt>Size: </dt><dd>Maximum 5 participants</dd>
+          <dt>After the session: </dt><dd>Claude Max Plan required to run the system</dd>
+        </dl>
+        <a class="btn" href="https://wa.me/61400179819?text=FLOODLIT%20-%20Catalyst%20Academy" target="_blank" rel="noopener">Book in for a Floodlit session →<small>Message me on WhatsApp</small></a>
+      </div>
+      <div class="price hl">
+        <div class="amt">$999 USD <span>/ session</span></div>
+        <h3>Private session</h3>
+        <p>Your file, your project, your team only. Full confidentiality. We run your actual schedule, not a demo file.</p>
+        <dl>
+          <dt>Format: </dt><dd>60 min live, Zoom or Teams</dd>
+          <dt>Who: </dt><dd>You and your team. No other participants.</dd>
+          <dt>After the session: </dt><dd>Claude Max Plan required to run the system</dd>
+        </dl>
+        <a class="btn" href="https://wa.me/61400179819?text=FLOODLIT%20-%20Private%20session" target="_blank" rel="noopener">Book in for a Floodlit session →<small>Message me on WhatsApp</small></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOT FOR -->
+<section id="notfor">
+  <div class="narrow">
+    <div class="kicker">Don't book if</div>
+    <h2>This isn't for you if...</h2>
+    <ul class="notfor">
+      <li>You want a reporting template, not a signal system</li>
+      <li>You think the schedule belongs to the planners</li>
+      <li>You're looking for more meetings, not fewer</li>
+      <li>Your project is under $100M. This is built for megaprojects.</li>
+      <li>You want a consultant to fix it without your team</li>
+      <li>You won't invest in Claude Max Plan to run it after</li>
+    </ul>
+  </div>
+</section>
+
+<!-- TWO OPTIONS -->
+<section id="close">
+  <div class="narrow">
+    <div class="kicker">So you've got two options</div>
+    <h2>January, or the whiteboard.</h2>
+    <div class="options">
+      <div class="opt a"><span class="marker">Wait for January</span><p>Go into the break on the monthly report. Come back to the Q1 review and find out what the schedule already knew in November.</p></div>
+      <div class="opt b"><span class="marker">WAR Room by Christmas</span><p>Get the number on the wall, the tools behind it and the dashboard in front of your PD. Before the shutdown.</p></div>
+    </div>
+    <div class="cta-row"><a class="btn" href="#book">Book in for a Floodlit session →</a></div>
+  </div>
+</section>
+
+<footer>
+  <div class="narrow">
+    <p><strong style="color:#fff">🍻 Beanie</strong> · Rebellious Catalyst at UNBOXED Workshops and Construction Skool</p>
+    <p>Catalyst Academy · skool.com/scrum</p>
+    <p class="q">"No one ever made a difference by being like everyone else." — P.T. Barnum</p>
+    <p class="legal">Floodlit is independent and not affiliated with Anthropic or Oracle. Stories show results on past projects, not a promise for yours. The 5D model is a mock-up with example data.</p>
+    <p class="legal"><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms and Disclaimer</a> · © 2026 Adam Lorne Bean · ABN 60 897 757 298</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+/* Countdown to Christmas (Sydney time) */
+(function () {
+  var el = document.getElementById('cd');
+  var target = Date.parse('2026-12-25T00:00:00+11:00');
+  function tick() {
+    var d = Math.max(0, target - Date.now());
+    var days = Math.floor(d / 864e5), h = Math.floor(d / 36e5) % 24, m = Math.floor(d / 6e4) % 60, s = Math.floor(d / 1e3) % 60;
+    el.textContent = days + ' days ' + h + 'h ' + m + 'm ' + s + 's';
+  }
+  tick(); setInterval(tick, 1000);
+})();
+
+/* 5D mock-up: example flotation plant (Three.js) */
+(function () {
+  var C = { done: 0x00B050, prog: 0xFFB000, red: 0xCC0000 };
+
+  // ---------- Example schedule ----------
+  var cells = [], i;
+  for (i = 0; i < 6; i++) cells.push({ id: 'R' + (i + 1), name: 'Rougher cell ' + (i + 1), s: 3 + i * 1.2, f: 9 + i * 1.2, hrs: 3200, di: 0, bank: 'R', idx: i });
+  for (i = 0; i < 4; i++) cells.push({ id: 'C' + (i + 1), name: 'Cleaner cell ' + (i + 1), s: 7 + i * 1.4, f: 13 + i * 1.4 + (i === 2 ? 3 : 0), hrs: 2600, di: 0, bank: 'C', idx: i, stuck: i === 2 ? [13.5, 16.8] : null });
+  var other = [
+    { id: 'CY', name: 'Cyclone cluster', s: 1, f: 6, hrs: 1800, di: 0 },
+    { id: 'TH', name: 'Concentrate thickener', s: 2, f: 14, hrs: 6400, di: 0 },
+    { id: 'P1', name: 'Slurry lines, roughers', s: 8, f: 17, hrs: 4200, di: 5400 },
+    { id: 'P2', name: 'Slurry lines, cleaners', s: 12, f: 21, hrs: 3000, di: 4200 },
+    { id: 'CM', name: 'Pre-commissioning', s: 20, f: 24, hrs: 3000, di: 0 }
+  ];
+  var all = cells.concat(other);
+  var byId = {};
+  all.forEach(function (e) { byId[e.id] = e; e.mats = []; e.shells = []; e.details = []; e.ghosts = []; e.segs = []; });
+
+  function prog(e, t) { return Math.max(0, Math.min(1, (t - e.s) / (e.f - e.s))); }
+  function status(e, t) {
+    if (e.stuck && t >= e.stuck[0] && t < e.stuck[1]) return 'red';
+    var p = prog(e, t);
+    return p <= 0 ? 'none' : p >= 1 ? 'done' : 'prog';
+  }
+  var stText = { none: 'Not started', prog: 'In progress', done: 'Complete', red: 'Held: mechanism not on site' };
+
+  // ---------- 3D scene ----------
+  var host = document.getElementById('plant');
+  var sceneBox = host.parentNode;
+  var gl = false;
+  try { var tc = document.createElement('canvas'); gl = !!(window.THREE && THREE.OrbitControls && (tc.getContext('webgl') || tc.getContext('experimental-webgl'))); } catch (err) { gl = false; }
+  var mode = 'status', curT = 0;
+  var scene, camera, renderer, controls, ray, pointer, pickables = [], frothSurfaces = [], water = null, labels = [];
+
+  if (gl) build(); else host.innerHTML = '<p style="color:#8a919c;font-size:13px;padding:80px 20px;text-align:center">The 3D view needs WebGL. The numbers below still play.</p>';
+
+  function build() {
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    host.appendChild(renderer.domElement);
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xc4ccd2);
+    scene.fog = new THREE.Fog(0xc4ccd2, 90, 190);
+    camera = new THREE.PerspectiveCamera(34, 1.6, 0.5, 500);
+    camera.position.set(-35, 26, 40);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.target.set(-3, 2.5, -2);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.minDistance = 18;
+    controls.maxDistance = 120;
+    controls.maxPolarAngle = 1.38;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.45;
+    controls.addEventListener('start', function () { controls.autoRotate = false; });
+    renderer.domElement.style.touchAction = 'pan-y';
+    if (window.matchMedia && matchMedia('(pointer: coarse)').matches) controls.enabled = false;
+
+    scene.add(new THREE.HemisphereLight(0xdfe7ee, 0x5e5240, 0.55));
+    var sun = new THREE.DirectionalLight(0xffeccc, 0.88);
+    sun.position.set(-32, 48, 28);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    var sc = sun.shadow.camera; sc.left = -48; sc.right = 48; sc.top = 40; sc.bottom = -40; sc.near = 1; sc.far = 160;
+    sun.shadow.bias = -0.0006;
+    scene.add(sun);
+
+    // Materials
+    function M(hex, o) { var m = new THREE.MeshStandardMaterial(Object.assign({ color: hex, roughness: 0.78, metalness: 0.12 }, o || {})); m.userData.real = hex; return m; }
+    function tintM(e, hex, o) { var m = M(hex, o); e.mats.push(m); return m; }
+    var concrete = M(0x9e9a92, { roughness: 0.95, metalness: 0 });
+    var steel = M(0x8c949b, { metalness: 0.45, roughness: 0.5 });
+    var grating = M(0x5d6268, { metalness: 0.4, roughness: 0.6 });
+    var rail = M(0xb3b9be, { metalness: 0.55, roughness: 0.4 });
+    var mech = M(0x3a3f45, { metalness: 0.4, roughness: 0.5 });
+    var motorM = M(0x2d5b86, { metalness: 0.35, roughness: 0.45 });
+    var frothM = M(0xc8b98a, { roughness: 0.95, metalness: 0 });
+    var ghostMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.16, depthWrite: false });
+
+    function add(geo, mat, x, y, z, parent) { var m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); (parent || scene).add(m); return m; }
+    function box(w, h, d, mat, x, y, z) { return add(new THREE.BoxGeometry(w, h, d), mat, x, y + h / 2, z); }
+    function cyl(r, h, mat, x, y, z, seg, open) {
+      var g = new THREE.CylinderGeometry(r, r, h, seg || 32, 1, !!open);
+      g.translate(0, h / 2, 0);
+      return add(g, mat, x, y, z);
+    }
+    function railRun(x1, z1, x2, z2, y) {
+      var dx = x2 - x1, dz = z2 - z1, L = Math.sqrt(dx * dx + dz * dz), ang = Math.atan2(dz, dx), n = Math.max(2, Math.round(L / 1.5)), out = [];
+      [0.55, 1.05].forEach(function (hh) { var r = box(L, 0.05, 0.05, rail, (x1 + x2) / 2, y + hh, (z1 + z2) / 2); r.rotation.y = -ang; out.push(r); });
+      for (var k = 0; k <= n; k++) { var f = k / n; out.push(box(0.06, 1.08, 0.06, rail, x1 + dx * f, y, z1 + dz * f)); }
+      return out;
+    }
+
+    // Ground, road, slab, bund
+    var ground = add(new THREE.PlaneGeometry(400, 400), M(0x8a7656, { roughness: 1, metalness: 0 }), 0, 0, 0);
+    ground.rotation.x = -Math.PI / 2;
+    box(160, 0.04, 7, M(0x67625a, { roughness: 1, metalness: 0 }), 0, 0, 15.5);
+    box(62, 0.4, 28, concrete, 0.5, 0, -3.5);
+    [[0.5, 10.3, 62, 0.4], [0.5, -17.3, 62, 0.4]].forEach(function (b) { box(b[2], 0.9, b[3], concrete, b[0], 0.4, b[1]); });
+    [[-30.3, -3.5], [31.3, -3.5]].forEach(function (b) { box(0.4, 0.9, 28, concrete, b[0], 0.4, b[1]); });
+
+    // Tank cell
+    function tankCell(e, x, z, baseY, r, h, plinth) {
+      if (plinth) cyl(r + 0.35, baseY, concrete, x, 0, z, 36);
+      var sh = cyl(r, h, tintM(e, 0x9db1c0, { metalness: 0.35, roughness: 0.55 }), x, baseY, z, 44);
+      sh.userData.el = e; pickables.push(sh); e.shells.push(sh);
+      var gh = cyl(r * 1.002, h, ghostMat, x, baseY, z, 44); gh.userData.noShadow = true; e.ghosts.push(gh);
+      var top = baseY + h;
+      var la = add(new THREE.TorusGeometry(r + 0.3, 0.24, 8, 44), tintM(e, 0x8a98a4, { metalness: 0.4 }), x, top - 0.35, z);
+      la.rotation.x = Math.PI / 2; e.details.push(la);
+      e.details.push(box(0.9, 0.9, 0.7, tintM(e, 0x8a98a4, { metalness: 0.4 }), x, top - 1.2, z + r + 0.55));
+      e.details.push(box(2 * r + 0.9, 0.35, 0.7, steel, x, top, z));
+      e.details.push(box(0.95, 0.7, 0.95, mech, x, top + 0.35, z));
+      e.details.push(cyl(0.38, 1.15, motorM, x, top + 1.05, z, 20));
+      var fr = add(new THREE.CircleGeometry(r - 0.05, 44), frothM, x, top - 0.28, z);
+      fr.rotation.x = -Math.PI / 2; fr.visible = false; frothSurfaces.push({ m: fr, e: e });
+      return top;
+    }
+
+    // Rougher bank: 6 cells, cascading down for gravity flow
+    cells.filter(function (c) { return c.bank === 'R'; }).forEach(function (c) {
+      var x = -20 + c.idx * 5.4, z = 6, baseY = 0.4 + (5 - c.idx) * 0.35, r = 2.3;
+      var top = tankCell(c, x, z, baseY, r, 4.6, true);
+      // walkway along the front of the bank
+      e2(c, box(5.4, 0.12, 1.3, grating, x, top - 0.1, z - r - 0.75));
+      railRun(x - 2.7, z - r - 1.4, x + 2.7, z - r - 1.4, top).forEach(function (m) { c.details.push(m); });
+      // interconnecting box to the next cell
+      if (c.idx < 5) c.details.push(box(1.0, 1.8, 1.1, steel, x + 2.7, baseY + 0.3, z));
+    });
+    function e2(e, m) { e.details.push(m); return m; }
+
+    // Cleaner bank on an elevated steel deck
+    var deckY = 3.6;
+    box(18.4, 0.25, 5.4, grating, -9.4, deckY - 0.25, -4);
+    [-18.4, -12.6, -6.8, -1].forEach(function (x) { [-6.5, -1.5].forEach(function (z) { box(0.35, deckY - 0.25, 0.35, steel, x, 0.4, z); }); });
+    [-15.5, -3.9].forEach(function (x) { var br = add(new THREE.BoxGeometry(0.15, 4.3, 0.15), steel, x, 2.0, -6.5); br.rotation.z = 0.85; });
+    railRun(-18.6, -1.3, -1.2, -1.3, deckY);
+    railRun(-18.6, -6.7, -1.2, -6.7, deckY);
+    var stair = add(new THREE.BoxGeometry(5.7, 0.18, 1.1), grating, 1.2, 1.95, -2.2); stair.rotation.z = -0.69;
+    cells.filter(function (c) { return c.bank === 'C'; }).forEach(function (c) {
+      tankCell(c, -16 + c.idx * 4.2, -4, deckY + (3 - c.idx) * 0.2, 1.7, 3.4, false);
+    });
+
+    // Concentrate thickener
+    (function () {
+      var e = byId.TH, X = 21, Z = -7, R = 8.5, H = 3.0, B = 0.4;
+      var floor = add(new THREE.CircleGeometry(R, 72), concrete, X, B + 0.03, Z); floor.rotation.x = -Math.PI / 2;
+      var wm = tintM(e, 0xb5b0a6, { roughness: 0.9, metalness: 0, side: THREE.DoubleSide });
+      var wall = cyl(R, H, wm, X, B, Z, 80, true); wall.userData.el = e; pickables.push(wall); e.shells.push(wall);
+      var gh = cyl(R, H, ghostMat, X, B, Z, 80, true); gh.userData.noShadow = true; e.ghosts.push(gh);
+      var top = B + H;
+      var ol = add(new THREE.TorusGeometry(R - 0.45, 0.22, 8, 80), tintM(e, 0x8a98a4, { metalness: 0.4 }), X, top - 0.3, Z); ol.rotation.x = Math.PI / 2; e.details.push(ol);
+      e.details.push(box(R + 1.2, 0.5, 1.6, steel, X - (R + 1.2) / 2, top + 0.15, Z));
+      railRun(X - R - 1.2, Z - 0.85, X, Z - 0.85, top + 0.65).forEach(function (m) { e.details.push(m); });
+      railRun(X - R - 1.2, Z + 0.85, X, Z + 0.85, top + 0.65).forEach(function (m) { e.details.push(m); });
+      e.details.push(cyl(0.6, top + 0.2, steel, X, B, Z, 16));
+      e.details.push(cyl(1.3, 1.0, mech, X, top + 0.65, Z, 28));
+      e.details.push(cyl(0.35, 1.0, motorM, X + 0.7, top + 1.6, Z, 16));
+      e.details.push(cyl(1.9, 2.3, M(0x7f888f, { metalness: 0.45, side: THREE.DoubleSide }), X, top - 1.6, Z, 32, true));
+      water = add(new THREE.CircleGeometry(R - 0.12, 80), M(0x6d6857, { roughness: 0.18, metalness: 0.25 }), X, top - 0.45, Z);
+      water.rotation.x = -Math.PI / 2; water.visible = false;
+    })();
+
+    // Cyclone cluster on its tower
+    (function () {
+      var e = byId.CY, X = -26, Z = 6, Y = 7;
+      [-1.6, 1.6].forEach(function (dx) { [-1.6, 1.6].forEach(function (dz) { box(0.3, Y, 0.3, steel, X + dx, 0.4, Z + dz); }); });
+      box(4.4, 0.3, 4.4, grating, X, Y, Z);
+      railRun(X - 2.2, Z - 2.2, X + 2.2, Z - 2.2, Y + 0.3); railRun(X - 2.2, Z + 2.2, X + 2.2, Z + 2.2, Y + 0.3);
+      var mf = cyl(0.55, 1.6, tintM(e, 0x9db1c0, { metalness: 0.35 }), X, Y + 0.3, Z, 24); mf.userData.el = e; pickables.push(mf); e.segs.push(mf);
+      var coneM = tintM(e, 0xd8d6d0, { roughness: 0.6 });
+      for (var k = 0; k < 6; k++) {
+        var a = k / 6 * Math.PI * 2, g = new THREE.Group();
+        var cone = new THREE.Mesh(new THREE.ConeGeometry(0.36, 1.9, 18), coneM); cone.rotation.x = Math.PI; g.add(cone);
+        var cap = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.6, 18), coneM); cap.position.y = 1.25; g.add(cap);
+        g.position.set(X + Math.cos(a) * 1.3, Y + 0.25, Z + Math.sin(a) * 1.3);
+        scene.add(g); e.segs.push(g); cone.userData.el = e; pickables.push(cone);
+      }
+    })();
+
+    // Pipe rack
+    for (var px = -25; px <= 14; px += 4.875) {
+      box(0.3, 5.0, 0.3, steel, px, 0.4, 0.2); box(0.3, 5.0, 0.3, steel, px, 0.4, 2.2);
+      box(0.3, 0.3, 2.4, steel, px, 5.1, 1.2);
+    }
+    box(39.5, 0.2, 0.2, steel, -5.5, 5.15, 0.2); box(39.5, 0.2, 0.2, steel, -5.5, 5.15, 2.2);
+
+    function pipe(e, pts, r) {
+      var m = tintM(e, 0x3a3f45, { metalness: 0.3, roughness: 0.6 }), fl = tintM(e, 0x5a6168, { metalness: 0.45 });
+      var up = new THREE.Vector3(0, 1, 0);
+      for (var k = 0; k < pts.length - 1; k++) {
+        var a = new THREE.Vector3().fromArray(pts[k]), b = new THREE.Vector3().fromArray(pts[k + 1]);
+        var steps = Math.max(1, Math.round(a.distanceTo(b) / 3));
+        for (var s = 0; s < steps; s++) {
+          var p0 = a.clone().lerp(b, s / steps), p1 = a.clone().lerp(b, (s + 1) / steps), len = p0.distanceTo(p1);
+          var g = new THREE.Group();
+          var c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 14), m); g.add(c);
+          var f = new THREE.Mesh(new THREE.CylinderGeometry(r * 1.4, r * 1.4, 0.14, 14), fl); f.position.y = len / 2 - 0.07; g.add(f);
+          g.position.copy(p0).lerp(p1, 0.5);
+          g.quaternion.setFromUnitVectors(up, p1.clone().sub(p0).normalize());
+          scene.add(g); e.segs.push(g); c.userData.el = e; pickables.push(c);
+        }
+        if (k < pts.length - 2) e.segs.push(add(new THREE.SphereGeometry(r * 1.06, 14, 10), m, b.x, b.y, b.z));
+      }
+    }
+    pipe(byId.P1, [[-26, 7.3, 3.8], [-26, 5.65, 1.6], [13.6, 5.65, 1.6], [13.6, 4.7, -6.4], [20.2, 4.7, -6.4]], 0.32);
+    cells.filter(function (c) { return c.bank === 'R'; }).forEach(function (c) {
+      var x = -20 + c.idx * 5.4 + 1.2, top = 0.4 + (5 - c.idx) * 0.35 + 4.6;
+      pipe(byId.P1, [[x, top - 1.3, 3.6], [x, top - 1.3, 2.4], [x, 5.95, 1.6]], 0.18);
+    });
+    pipe(byId.P2, [[-17, 4.4, -1.8], [-17, 4.4, 0.8], [-17, 5.55, 0.8], [12.8, 5.55, 0.8], [12.8, 4.6, -7.6], [20.2, 4.6, -7.6]], 0.24);
+
+    // Pump skid, MCC room, light poles
+    box(2.6, 0.35, 1.3, steel, 11.5, 0.4, 6.4);
+    var pc = add(new THREE.CylinderGeometry(0.55, 0.55, 0.6, 20), M(0x2f6b4f, { metalness: 0.35 }), 10.8, 1.3, 6.4); pc.rotation.x = Math.PI / 2;
+    var pm = add(new THREE.CylinderGeometry(0.4, 0.4, 1.2, 18), motorM, 12.2, 1.2, 6.4); pm.rotation.z = Math.PI / 2;
+    box(7, 3.4, 4.5, M(0xd8d5cc, { roughness: 0.85 }), -24, 0.4, -10);
+    box(7.4, 0.25, 4.9, M(0x8b939a, { metalness: 0.5, roughness: 0.4 }), -24, 3.8, -10);
+    box(1.1, 2.1, 0.08, M(0x51575d), -25.5, 0.4, -7.72);
+    box(1.2, 0.8, 0.6, M(0xe9e7e1), -22, 1.8, -7.5);
+    [[-29, -1], [17, 3.8], [-6, -16]].forEach(function (p) { cyl(0.12, 10, steel, p[0], 0.4, p[1], 10); box(0.9, 0.25, 0.5, mech, p[0] + 0.3, 10.4, p[1]); });
+
+    scene.traverse(function (o) { if (o.isMesh && !o.userData.noShadow && o.material !== ghostMat) { o.castShadow = true; o.receiveShadow = true; } });
+    ground.castShadow = false;
+
+    // Labels
+    [['Rougher bank', -9, 7.6, 9.5], ['Cleaner bank', -9.5, 9.5, -4], ['Thickener', 21, 6.5, -7], ['Cyclones', -26, 11.2, 6]].forEach(function (l) {
+      var d = document.createElement('div'); d.className = 'lbl3d'; d.textContent = l[0]; sceneBox.appendChild(d);
+      labels.push({ el: d, v: new THREE.Vector3(l[1], l[2], l[3]) });
+    });
+
+    // Hover tooltip
+    ray = new THREE.Raycaster(); pointer = new THREE.Vector2();
+    var tip = document.createElement('div'); tip.className = 'tip3d'; sceneBox.appendChild(tip);
+    renderer.domElement.addEventListener('pointermove', function (ev) {
+      var r = renderer.domElement.getBoundingClientRect();
+      pointer.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(pointer, camera);
+      var hit = ray.intersectObjects(pickables.filter(function (m) { var o = m; while (o) { if (!o.visible) return false; o = o.parent; } return true; }), false)[0];
+      if (hit && hit.object.userData.el) {
+        var e = hit.object.userData.el, st = status(e, curT);
+        tip.innerHTML = '<b>' + e.id + '</b> ' + e.name + '<br><span class="' + st + '">' + stText[st] + ' · ' + Math.round(prog(e, curT) * 100) + '%</span>';
+        tip.style.left = (ev.clientX - r.left + 14) + 'px'; tip.style.top = (ev.clientY - r.top + 14) + 'px'; tip.style.display = 'block';
+        renderer.domElement.style.cursor = 'pointer';
+      } else { tip.style.display = 'none'; renderer.domElement.style.cursor = ''; }
+    });
+    renderer.domElement.addEventListener('pointerleave', function () { tip.style.display = 'none'; });
+
+    function size() {
+      var w = host.clientWidth, h = host.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      renderer.domElement.style.width = w + 'px'; renderer.domElement.style.height = h + 'px';
+      camera.aspect = w / h;
+      camera.fov = w / h < 1.3 ? 46 : 34;
+      camera.updateProjectionMatrix();
+    }
+    size();
+    if (window.ResizeObserver) new ResizeObserver(size).observe(host); else window.addEventListener('resize', size);
+
+    var onScreen = true;
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (en) { onScreen = en[0].isIntersecting; }).observe(host);
+    var v = new THREE.Vector3();
+    (function loop() {
+      requestAnimationFrame(loop);
+      if (!onScreen) return;
+      controls.update();
+      renderer.render(scene, camera);
+      var w = host.clientWidth, h = host.clientHeight;
+      labels.forEach(function (l) {
+        v.copy(l.v).project(camera);
+        if (v.z > 1) { l.el.style.display = 'none'; return; }
+        l.el.style.display = 'block';
+        l.el.style.transform = 'translate(-50%,-100%) translate(' + ((v.x + 1) / 2 * w) + 'px,' + ((1 - v.y) / 2 * h) + 'px)';
+      });
+    })();
+  }
+
+  function paintScene(t) {
+    if (!gl) return;
+    all.forEach(function (e) {
+      var p = prog(e, t), st = status(e, t);
+      var col = st === 'red' ? C.red : mode === 'status' ? (st === 'done' ? C.done : st === 'prog' ? C.prog : null) : null;
+      e.mats.forEach(function (m) { m.color.setHex(col !== null ? col : m.userData.real); });
+      e.shells.forEach(function (s) { s.visible = p > 0; s.scale.y = Math.max(0.03, p); });
+      e.ghosts.forEach(function (g) { g.visible = p < 1; });
+      e.details.forEach(function (d) { d.visible = p >= 1; });
+      var n = e.segs.length;
+      e.segs.forEach(function (s, k) { s.visible = p > 0 && (k + 0.5) / n <= p; });
+    });
+    var cm = prog(byId.CM, t);
+    frothSurfaces.forEach(function (f) { f.m.visible = cm > 0 && prog(f.e, t) >= 1; });
+    if (water) water.visible = cm > 0.35;
+  }
+
+  // ---------- Timeline, KPIs, side panel ----------
+  var milestones = [
+    { w: 1, t: 'Cyclone cluster starts', s: 'Tower steel up, cones next' },
+    { w: 3, t: 'First rougher cell set', s: 'Shell courses lifted in' },
+    { w: 8, t: 'Slurry piping starts', s: 'Welding tracked in dia inches' },
+    { w: 13.5, t: 'Cleaner 3 held', s: 'Mechanism not on site. Named on the board.' },
+    { w: 17, t: 'Rougher lines welded out', s: '5,400 DI complete' },
+    { w: 24, t: 'Ready for wet commissioning', s: 'All 10 cells, thickener, lines' }
+  ];
+  var whenEl = document.getElementById('when');
+  milestones.forEach(function (m) {
+    var d = document.createElement('div');
+    d.innerHTML = '<b>Wk ' + Math.floor(m.w) + '</b> ' + m.t + '<br><span style="opacity:.8">' + m.s + '</span>';
+    whenEl.appendChild(d); m.el = d;
+  });
+
+  var range = document.getElementById('week');
+  var btn = document.getElementById('play');
+
+  function render(t) {
+    curT = t;
+    paintScene(t);
+    var done = cells.filter(function (c) { return prog(c, t) >= 1; }).length;
+    var hrs = all.reduce(function (a, e) { return a + e.hrs * prog(e, t); }, 0);
+    var di = all.reduce(function (a, e) { return a + e.di * prog(e, t); }, 0);
+    document.getElementById('kCells').textContent = done + ' of 10';
+    document.getElementById('kHrs').textContent = Math.round(hrs).toLocaleString('en-AU');
+    document.getElementById('kDI').textContent = Math.round(di).toLocaleString('en-AU');
+    document.getElementById('wkLbl').textContent = 'Week ' + Math.floor(t);
+
+    var chaos = t < 1 ? null : Math.round(18 + (t > 12 ? 30 * Math.min(1, (t - 12) / 2.5) : 0) - (t > 16.8 ? 26 * Math.min(1, (t - 16.8) / 3) : 0) + (t > 6 ? 8 : 0));
+    var kc = document.getElementById('kChaos'), kb = document.getElementById('kChaosBand');
+    if (chaos === null) { kc.textContent = '-'; kb.innerHTML = '&nbsp;'; kc.style.color = '#fff'; }
+    else {
+      kc.textContent = chaos;
+      var band = chaos < 25 ? ['ON TRACK', '#00B050'] : chaos < 50 ? ['CAUTION', '#FFB000'] : chaos < 75 ? ['WARNING', '#ff3b3b'] : ['CRITICAL', '#CC0000'];
+      kb.textContent = band[0]; kc.style.color = band[1];
+    }
+    var p90 = t < 1 ? '-' : (t > 13 && t < 16.8) ? 'Wk 27' : 'Wk 25';
+    var kp = document.getElementById('kP90'); kp.textContent = p90; kp.style.color = p90 === 'Wk 27' ? '#ff3b3b' : '#fff';
+
+    var rows = all.filter(function (e) { return (e.s >= t && e.s < t + 1) || status(e, t) === 'red'; });
+    var tb = document.getElementById('sideTable');
+    tb.innerHTML = '';
+    if (!rows.length) tb.innerHTML = '<tr><td colspan="2" style="color:#6d7480;border:none">Nothing starts in the next 7 days.</td></tr>';
+    rows.forEach(function (e) {
+      var tr = document.createElement('tr'), red = status(e, t) === 'red';
+      tr.innerHTML = '<td>' + e.id + '</td><td' + (red ? ' class="flag"' : '') + '>' + e.name + (red ? ': held, mechanism not on site' : ': starts') + '</td>';
+      tb.appendChild(tr);
+    });
+
+    var nowIdx = -1;
+    milestones.forEach(function (m, k) { if (t >= m.w) nowIdx = k; });
+    milestones.forEach(function (m, k) { m.el.className = k < nowIdx ? 'done' : k === nowIdx ? 'now' : ''; });
+  }
+
+  var playing = false, raf = null, last = 0;
+  function step(ts) {
+    if (!playing) return;
+    if (!last) last = ts;
+    var t = curT + (ts - last) / 1000 * 1.2;
+    last = ts;
+    if (t >= 24) { t = 24; stop(); }
+    range.value = t; render(t);
+    if (playing) raf = requestAnimationFrame(step);
+  }
+  function stop() { playing = false; btn.textContent = '▶ Play'; cancelAnimationFrame(raf); last = 0; }
+  btn.addEventListener('click', function () {
+    if (playing) { stop(); return; }
+    if (curT >= 24) { range.value = 0; render(0); }
+    playing = true; btn.textContent = '❚❚ Pause'; raf = requestAnimationFrame(step);
+  });
+  range.addEventListener('input', function () { stop(); render(parseFloat(range.value)); });
+
+  var vm = document.getElementById('viewMode');
+  vm.addEventListener('click', function () {
+    mode = mode === 'status' ? 'real' : 'status';
+    vm.textContent = mode === 'status' ? 'Realistic view' : 'Status colours';
+    document.getElementById('legend').style.opacity = mode === 'status' ? 1 : 0.35;
+    render(curT);
+  });
+
+  var startW = parseFloat((location.hash.match(/w=([\d.]+)/) || [])[1]);
+  if (startW >= 0 && startW <= 24) range.value = startW;
+  if (/real/.test(location.hash)) vm.click();
+  render(parseFloat(range.value));
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (en) {
+      if (en[0].isIntersecting && !playing && curT === 0) { btn.click(); io.disconnect(); }
+    }, { threshold: 0.5 });
+    io.observe(host);
+  }
+})();
+
+</script>
+</body>
+</html>
